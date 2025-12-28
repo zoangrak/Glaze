@@ -1,14 +1,15 @@
 import SwiftUI
 
 public struct BoxView: View {
-    let group: GlazeGroup
-
+    let note: GlazeNote
+    
     public var body: some View {
         RoundedRectangle(cornerRadius: 24)
-            .stroke(Color(group.theme.accentColorHex), lineWidth: 2)
+            .stroke(Color(hex: note.theme.accentColorHex), lineWidth: 2)
             .overlay(
-                Text(group.content)
+                Text(note.content)
                     .padding()
+                    .foregroundStyle(.primary)
             )
     }
 }

@@ -2,51 +2,65 @@ import Foundation
 import WidgetKit
 
 struct GlazeShared {
-    static let appGroup = "group.Keusae.Glaze"
-    static let dataKey = "saved_glaze_data"
+    // 전역 상수도 격리 해제
+    nonisolated static let appGroup = "group.Keusae.Glaze"
+    nonisolated static let dataKey = "saved_glaze_data"
 
-    // MARK: - Save (앱에서 사용)
-    /// 앱의 데이터를 통째로 저장하고 위젯을 깨웁니다.
-    static func save(sections: [GlazeSection]) {
-        // 백그라운드 스레드에서 저장 (UI 버벅임 방지)
-        DispatchQueue.global(qos: .background).async {
-            guard let sharedDefaults = UserDefaults(suiteName: appGroup) else {
-                print("❌ App Group 연결 실패: ID를 확인하세요.")
-                return
-            }
-            
-            if let encoded = try? JSONEncoder().encode(sections) {
-                sharedDefaults.set(encoded, forKey: dataKey)
-                print("💾 위젯 데이터 저장 완료")
-                
-                // 위젯에게 "데이터 바뀌었으니 다시 그려!" 라고 소리치기
+    // MARK: - Save (앱에서 호출)
+    nonisolated static func save(groups: [GlazeGroup]) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let defaults = UserDefaults(suiteName: appGroup) else { return }
+
+            if let encoded = try? JSONEncoder().encode(groups) {
+                defaults.set(encoded, forKey: dataKey)
+                // 저장 즉시 위젯 타임라인 갱신 요청
                 WidgetCenter.shared.reloadAllTimelines()
             }
         }
     }
     
-    // MARK: - Load (위젯 & Intent에서 사용)
-    /// 저장된 모든 노트를 불러옵니다.
-    static func loadAllGroups() -> [GlazeGroup] {
-        guard let sharedDefaults = UserDefaults(suiteName: appGroup) else {
+    // MARK: - Load (앱 & 위젯 공용)
+    nonisolated static func loadGroups() -> [GlazeGroup] {
+        guard let defaults = UserDefaults(suiteName: appGroup),
+              let data = defaults.data(forKey: dataKey),
+              let groups = try? JSONDecoder().decode([GlazeGroup].self, from: data)
+        else {
             return []
         }
-        
-        guard let data = sharedDefaults.data(forKey: dataKey),
-              let sections = try? JSONDecoder().decode([GlazeSection].self, from: data) else {
-            return []
-        }
-        
-        // 섹션 안에 있는 노트들을 다 꺼내서 하나의 배열로 만듦
-        return sections.flatMap { $0.notes }
+        return groups
     }
     
-    static func loadSections() -> [GlazeSection]? {
-        guard let sharedDefaults = UserDefaults(suiteName: appGroup),
-              let data = sharedDefaults.data(forKey: dataKey),
-              let sections = try? JSONDecoder().decode([GlazeSection].self, from: data) else {
-            return nil
+    // 위젯 Provider에서 사용 (모든 메모 평탄화)
+    nonisolated static func loadAllNotes() -> [GlazeNote] {
+        return loadGroups().flatMap { $0.notes }
+    }
+    
+    // Intent에서 사용 (가벼운 스냅샷)
+    nonisolated static func loadNoteSnapshots() -> [GlazeNoteSnapshot] {
+        return loadAllNotes().map { note in
+            // 안전하게 여기서 제목을 직접 계산 (MainActor 충돌 방지)
+            let trimmed = note.content.trimmingCharacters(in: .whitespacesAndNewlines)
+            let safeTitle: String
+            
+            if trimmed.isEmpty {
+                safeTitle = "New Note"
+            } else {
+                let firstLine = trimmed.components(separatedBy: .newlines).first ?? ""
+                safeTitle = String(firstLine.prefix(50))
+            }
+            
+            return GlazeNoteSnapshot(id: note.id, title: safeTitle)
         }
-        return sections
+    }
+}
+
+// Intent용 경량 모델
+public struct GlazeNoteSnapshot: Identifiable, Sendable, Codable {
+    public let id: UUID
+    public let title: String
+    
+    nonisolated public init(id: UUID, title: String) {
+        self.id = id
+        self.title = title
     }
 }

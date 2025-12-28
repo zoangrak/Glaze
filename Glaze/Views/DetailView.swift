@@ -3,21 +3,20 @@ import SwiftUI
 struct DetailView: View {
     @ObservedObject var store: GlazeStore
     @Binding var selection: UUID?
-
+    
     var body: some View {
-        if let group = selectedGroup {
-            EditorView(group: group) { updated in
-                store.update(note: updated)
+        if let note = selectedNote {
+            EditorView(note: note) { updatedNote in
+                store.update(note: updatedNote)
             }
         } else {
             Text("No Selection")
                 .foregroundStyle(.secondary)
         }
     }
-
-    private var selectedGroup: GlazeGroup? {
+    
+    private var selectedNote: GlazeNote? {
         guard let id = selection else { return nil }
-        return store.allGroups.first { $0.id == id }
+        return store.allNotes.first { $0.id == id }
     }
 }
-

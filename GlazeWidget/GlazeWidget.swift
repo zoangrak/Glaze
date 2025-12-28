@@ -6,11 +6,10 @@ struct GlazeWidget: Widget {
     let kind: String = "GlazeWidget"
 
     var body: some WidgetConfiguration {
-        // ✨ AppIntentConfiguration을 써야 '편집' 기능이 생깁니다.
         AppIntentConfiguration(
             kind: kind,
-            intent: GlazeConfigurationIntent.self, // 방금 만든 설정
-            provider: Provider() // 방금 만든 엔진
+            intent: GlazeConfigurationIntent.self,
+            provider: Provider()
         ) { entry in
             GlazeWidgetEntryView(entry: entry)
         }

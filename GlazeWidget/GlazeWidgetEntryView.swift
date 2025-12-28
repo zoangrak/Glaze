@@ -3,30 +3,28 @@ import WidgetKit
 
 struct GlazeWidgetEntryView: View {
     var entry: Provider.Entry
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let group = entry.group {
-                // 📝 1. 메모 내용 표시 (순수 텍스트)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(group.name)
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.secondary)
-                    
-                    Text(group.content)
-                        .font(.system(size: 13))
-                        .lineLimit(nil) // 줄 수 제한 없이 꽉 차게
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                }
+            if let note = entry.note {
+                Text(note.content)
+                    .font(.system(size: 13))
+                    .lineSpacing(3)
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .overlay(alignment: .topLeading) {
+                        if note.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text("빈 메모")
+                                .foregroundStyle(.tertiary)
+                                .font(.caption)
+                        }
+                    }
             } else {
-                // 📭 2. 선택된 메모 없을 때
-                VStack(spacing: 6) {
-                    Image(systemName: "doc.text")
-                        .font(.title2)
+                VStack(spacing: 8) {
+                    Image(systemName: "square.and.pencil")
+                        .font(.largeTitle)
                         .foregroundStyle(.tertiary)
-                    Text("메모를 선택하세요")
+                    Text("작성된 메모가 없습니다")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -2,42 +2,57 @@ import SwiftUI
 import AppKit
 
 struct EditorView: NSViewRepresentable {
-    let group: GlazeGroup
-    let onChange: (GlazeGroup) -> Void
-
+    var note: GlazeNote
+    var onChange: (GlazeNote) -> Void
+    
     func makeNSView(context: Context) -> NSTextView {
         let tv = NSTextView()
-        tv.string = group.content
-        tv.font = .systemFont(ofSize: group.theme.bodySize)
-        tv.delegate = context.coordinator
+        tv.isRichText = false
+        tv.allowsUndo = true
         tv.backgroundColor = .clear
+        
+        tv.string = note.content
+        tv.font = .systemFont(ofSize: CGFloat(note.theme.bodySize))
+        
+        tv.delegate = context.coordinator
+        tv.autoresizingMask = [.width, .height]
+        
         return tv
     }
 
     func updateNSView(_ nsView: NSTextView, context: Context) {
-        if nsView.string != group.content {
-            nsView.string = group.content
+        if nsView.string != note.content {
+            nsView.string = note.content
         }
+        
+        let targetSize = CGFloat(note.theme.bodySize)
+        if nsView.font?.pointSize != targetSize {
+            nsView.font = .systemFont(ofSize: targetSize)
+        }
+
+        context.coordinator.parentNote = note
+        context.coordinator.onChange = onChange
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(group: group, onChange: onChange)
+        Coordinator(parentNote: note, onChange: onChange)
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
-        var group: GlazeGroup
-        let onChange: (GlazeGroup) -> Void
+        var parentNote: GlazeNote
+        var onChange: (GlazeNote) -> Void
 
-        init(group: GlazeGroup, onChange: @escaping (GlazeGroup) -> Void) {
-            self.group = group
+        init(parentNote: GlazeNote, onChange: @escaping (GlazeNote) -> Void) {
+            self.parentNote = parentNote
             self.onChange = onChange
         }
 
         func textDidChange(_ notification: Notification) {
             guard let tv = notification.object as? NSTextView else { return }
-            group.content = tv.string
-            onChange(group)
+            var updatedNote = parentNote
+            updatedNote.content = tv.string
+            onChange(updatedNote)
+            self.parentNote = updatedNote
         }
     }
 }
-

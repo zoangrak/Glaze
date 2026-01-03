@@ -1,58 +1,75 @@
 import Foundation
+import SwiftData
 import SwiftUI
 
-// MARK: - Theme
-public struct GlazeTheme: Codable, Hashable, Sendable {
-    public var accentColorHex: String
-    public var bodySize: Double
+@Model
+final class GlazeCollection {
+    var name: String
+    var createdAt: Date
+    @Relationship(deleteRule: .cascade, inverse: \GlazeFolder.collection)
+    var folders: [GlazeFolder] = []
     
-    public init(accentColorHex: String = "#00C7BE", bodySize: Double = 16) {
-        self.accentColorHex = accentColorHex
-        self.bodySize = bodySize
-    }
-}
-
-// MARK: - Note (단일 메모)
-public struct GlazeNote: Codable, Hashable, Identifiable, Sendable {
-    public let id: UUID
-    public var content: String
-    public var theme: GlazeTheme
-    public var createdAt: Date
-    
-    // 제목 계산 (앱 내부 사용용)
-    public var title: String {
-        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty { return "New Note" }
-        let firstLine = trimmed.components(separatedBy: .newlines).first ?? ""
-        return String(firstLine.prefix(50))
-    }
-    
-    public init(
-        id: UUID = UUID(),
-        content: String = "",
-        theme: GlazeTheme = GlazeTheme(),
-        createdAt: Date = Date()
-    ) {
-        self.id = id
-        self.content = content
-        self.theme = theme
-        self.createdAt = createdAt
-    }
-}
-
-// MARK: - Group (폴더)
-public struct GlazeGroup: Codable, Hashable, Identifiable, Sendable {
-    public let id: UUID
-    public var name: String
-    public var notes: [GlazeNote]
-    
-    public init(
-        id: UUID = UUID(),
-        name: String,
-        notes: [GlazeNote] = []
-    ) {
-        self.id = id
+    init(name: String = "새 컬렉션") {
         self.name = name
-        self.notes = notes
+        self.createdAt = Date()
     }
+}
+
+@Model
+final class GlazeFolder {
+    var name: String
+    var systemImage: String
+    var isPinned: Bool
+    var isDefault: Bool
+    var createdAt: Date
+    
+    var collection: GlazeCollection?
+    @Relationship(deleteRule: .cascade, inverse: \GlazeNote.folder)
+    var notes: [GlazeNote] = []
+    
+    // init 수정
+    init(name: String = "새 폴더", systemImage: String = "folder", isPinned: Bool = false, isDefault: Bool = false) {
+        self.name = name
+        self.systemImage = systemImage
+        self.isPinned = isPinned
+        self.isDefault = isDefault
+        self.createdAt = Date()
+    }
+}
+
+@Model
+final class GlazeNote {
+    var id: UUID = UUID()
+    var content: String
+    var createdAt: Date
+    var lastModified: Date
+    var isPinned: Bool = false
+    
+    var folder: GlazeFolder?
+    
+    // 디자인 속성
+    var backgroundColorHex: String = "#FFFFFF"
+    var textColorHex: String = "#1C1C1E"
+    var cornerRadius: Double = 28.0
+    var hAlignment: Int = 1
+    var fontSize: Double = 18.0
+    var fontWeight: String = "Regular"
+    
+    init(content: String = "") {
+        self.content = content
+        self.createdAt = Date()
+        self.lastModified = Date()
+    }
+}
+
+// WidgetNoteEntity는 기존 유지
+struct GlazeNoteEntity: Codable, Identifiable, Sendable {
+    let id: UUID
+    let content: String
+    let backgroundColorHex: String
+    let textColorHex: String
+    let cornerRadius: Double
+    let hAlignment: Int
+    let fontSize: Double
+    let fontWeight: String
 }

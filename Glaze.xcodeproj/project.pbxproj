@@ -45,26 +45,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4C1A9E572F01A1520078FC8C /* Exceptions for "GlazeWidget" folder in "Glaze" target */ = {
+		4C122E2E2F090A580073DCD5 /* Exceptions for "Glaze" folder in "GlazeWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				GlazeConfigurationIntent.swift,
+				Models/GlazeModels.swift,
+				Models/SidebarState.swift,
+				Models/WidgetSync.swift,
+				Support/Extensions.swift,
 			);
-			target = 4CB292F02EFFAB270058D28E /* Glaze */;
+			target = 4CB2930F2EFFB56F0058D28E /* GlazeWidgetExtension */;
 		};
 		4CB293252EFFB5710058D28E /* Exceptions for "GlazeWidget" folder in "GlazeWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-			);
-			target = 4CB2930F2EFFB56F0058D28E /* GlazeWidgetExtension */;
-		};
-		4CB293302EFFB7A90058D28E /* Exceptions for "Glaze" folder in "GlazeWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Models/GlazeModels.swift,
-				Models/GlazeShared.swift,
-				Stores/GlazeStore.swift,
 			);
 			target = 4CB2930F2EFFB56F0058D28E /* GlazeWidgetExtension */;
 		};
@@ -74,7 +68,7 @@
 		4CB292F32EFFAB270058D28E /* Glaze */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4CB293302EFFB7A90058D28E /* Exceptions for "Glaze" folder in "GlazeWidgetExtension" target */,
+				4C122E2E2F090A580073DCD5 /* Exceptions for "Glaze" folder in "GlazeWidgetExtension" target */,
 			);
 			path = Glaze;
 			sourceTree = "<group>";
@@ -82,7 +76,6 @@
 		4CB293162EFFB5700058D28E /* GlazeWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4C1A9E572F01A1520078FC8C /* Exceptions for "GlazeWidget" folder in "Glaze" target */,
 				4CB293252EFFB5710058D28E /* Exceptions for "GlazeWidget" folder in "GlazeWidgetExtension" target */,
 			);
 			path = GlazeWidget;

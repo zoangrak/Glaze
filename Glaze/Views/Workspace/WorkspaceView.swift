@@ -4,6 +4,8 @@ struct WorkspaceView: View {
     var folder: GlazeFolder
     @Binding var selectedNoteId: UUID?
     @Binding var editingNote: GlazeNote?
+    
+    var viewMode: ViewMode
 
     var body: some View {
         ZStack {
@@ -12,7 +14,12 @@ struct WorkspaceView: View {
                     withAnimation(.spring(response: 0.4)) { editingNote = nil }
                 }
             } else {
-                BrowserView(folder: folder, selectedId: $selectedNoteId, editingNote: $editingNote)
+                BrowserView(
+                    folder: folder,
+                    selectedId: $selectedNoteId,
+                    editingNote: $editingNote,
+                    viewMode: viewMode
+                )
             }
         }
     }

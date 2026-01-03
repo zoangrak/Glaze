@@ -40,6 +40,7 @@ final class GlazeFolder {
 @Model
 final class GlazeNote {
     var id: UUID = UUID()
+    var title: String = ""
     var content: String
     var createdAt: Date
     var lastModified: Date
@@ -55,7 +56,7 @@ final class GlazeNote {
     var fontSize: Double = 18.0
     var fontWeight: String = "Regular"
     
-    init(content: String = "") {
+    init(title: String = "", content: String = "") {
         self.content = content
         self.createdAt = Date()
         self.lastModified = Date()

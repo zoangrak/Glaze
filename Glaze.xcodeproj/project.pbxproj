@@ -49,7 +49,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Models/GlazeModels.swift,
-				Models/SidebarState.swift,
+				Models/State.swift,
 				Models/WidgetSync.swift,
 				Support/Extensions.swift,
 			);

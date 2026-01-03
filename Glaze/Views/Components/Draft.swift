@@ -6,14 +6,18 @@ struct Draft: View {
     
     @Binding var selectedNoteId: UUID?
     @Binding var editingNote: GlazeNote?
+    
+    // ✅ 변수 추가
+    var viewMode: ViewMode
 
     var body: some View {
+        // ✅ BrowserView로 viewMode 전달
         BrowserView(
             folder: folder,
             selectedId: $selectedNoteId,
-            editingNote: $editingNote
+            editingNote: $editingNote,
+            viewMode: viewMode
         )
-        .navigationTitle("Drafts") // 타이틀 강제 고정
-        // .navigationBarBackButtonHidden(true) // 필요하면 이런 옵션 추가 가능
+        // .navigationTitle("Drafts") // ❌ MainScene 제어 권장
     }
 }
